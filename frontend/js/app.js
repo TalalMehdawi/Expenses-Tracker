@@ -27,7 +27,8 @@ const API_URL = "http://localhost:3000/api/expenses";
 
 let currentCategory="All";
 
-async function getExpenses() {
+async function getExpenses() 
+{
 
 
     showSpinner();
@@ -46,6 +47,8 @@ async function getExpenses() {
    
 }
 
+
+
 async function renderTableAndSummury() {
 
     let expenseData = await getExpenses();
@@ -59,67 +62,29 @@ async function renderTableAndSummury() {
     tableBody.innerHTML = "";
 
     expenseData.forEach(element => {
-        const tdTitle = document.createElement("td");
-        tdTitle.textContent = element.title;
-
-        const tdAmount = document.createElement("td");
-        tdAmount.textContent = element.amount;
-
-        const tdCategory = document.createElement("td");
-        tdCategory.textContent = element.category;
-
-        const tdDate = document.createElement("td");
-        tdDate.textContent = element.date;
-
-        // === عمود الأزرار الجديد ===
-        const tdActions = document.createElement("td");
-        tdActions.className="text-end";
-        const editBtn = document.createElement("button");
-        
-        editBtn.className = "btn btn-sm btn-dark me-1 ";
-        editBtn.textContent = "Edit";
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "btn btn-sm btn-danger ";
-        deleteBtn.textContent = "Delete";
-
-        deleteBtn.addEventListener("click", async () => {
-            try {
-                await deleteExpense(element.id);
-                await renderTableAndSummury();
-            } catch (err) {
-                alert("Failed to delete: " + err.message);
-            }
-        });
-
-        editBtn.addEventListener("click", () => {
-            fillFormForEdit(element);
-        });
-
-        tdActions.appendChild(editBtn);
-        tdActions.appendChild(deleteBtn);
-        // ===========================
-
-        const tableRow = document.createElement("tr");
-
-        tableRow.appendChild(tdTitle);
-        tableRow.appendChild(tdAmount);
-        tableRow.appendChild(tdCategory);
-        tableRow.appendChild(tdDate);
-        tableRow.appendChild(tdActions); // أضفنا العمود هون
-        tableBody.appendChild(tableRow);
-    });
+        renderOneElement(element,tableBody)});
 
     renderSummary(expenseData);
 }
+
+
 async function renderSummary(expenseData) {
 
     let total = expenseData.reduce((acc,element)=>element.amount+acc,0);
+    if(expenseData.length===0)
+    {
+        document.getElementById("totalAmount").textContent=0;
+        document.getElementById("expenseCount").textContent=0;
+        document.getElementById("highestAmount").textContent=0;
+        return;
+    }
     const highestAmount=Math.max(...expenseData.map(ele=>ele.amount));
     document.getElementById("totalAmount").textContent=total;
     document.getElementById("expenseCount").textContent=expenseData.length;
-    document.getElementById("highestAmount").textContent=highestAmount;
+    document.getElementById("highestAmount").textContent=highestAmount.toFixed(2);
 }
+
+
 renderTableAndSummury();
 
 const categoryFilter=document.getElementById("categoryFilter");
@@ -160,7 +125,7 @@ async function addExpense()
     .then(response => response.json())
     .then(data => console.log(data))
     .catch(error => console.error("Error:", error));
-    renderTableAndSummury();
+    await renderTableAndSummury();
 }
 
 
@@ -211,8 +176,85 @@ async function updateExpense(id, updatedExpense)
     .then(response => response.json())
     .then(data => console.log(data))
     .catch(error => console.error("Error:", error));
-    renderTableAndSummury();
+   await renderTableAndSummury();
 }
+
+const sbtn=document.getElementById("sbtn");
+
+sbtn.addEventListener('click',search);
+
+function renderOneElement(element,tableBody)
+{
+
+     const tdTitle = document.createElement("td");
+        tdTitle.textContent = element.title;
+
+        const tdAmount = document.createElement("td");
+        tdAmount.textContent = element.amount;
+
+        const tdCategory = document.createElement("td");
+        tdCategory.textContent = element.category;
+
+        const tdDate = document.createElement("td");
+        tdDate.textContent = element.date;
+
+        // === عمود الأزرار الجديد ===
+        const tdActions = document.createElement("td");
+        tdActions.className="text-end";
+        const editBtn = document.createElement("button");
+        
+        editBtn.className = "btn btn-sm btn-dark me-1 ";
+        editBtn.textContent = "Edit";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn btn-sm btn-danger ";
+        deleteBtn.textContent = "Delete";
+
+        deleteBtn.addEventListener("click", async () => {
+            try {
+                await deleteExpense(element.id);
+                await renderTableAndSummury();
+            } catch (err) {
+                alert("Failed to delete: " + err.message);
+            }
+        });
+
+        editBtn.addEventListener("click", () => {
+            fillFormForEdit(element);
+        });
+
+        tdActions.appendChild(editBtn);
+        tdActions.appendChild(deleteBtn);
+  
+
+        const tableRow = document.createElement("tr");
+
+        tableRow.appendChild(tdTitle);
+        tableRow.appendChild(tdAmount);
+        tableRow.appendChild(tdCategory);
+        tableRow.appendChild(tdDate);
+        tableRow.appendChild(tdActions); // أضفنا العمود هون
+        tableBody.appendChild(tableRow);
+    
+
+}
+
+async function search ()
+{
+    let expenseData = await getExpenses();
+    const searchValue=document.getElementById("searchInput").value;
+    let element = expenseData.find(e=>e.title===searchValue);
+    if(!element)
+    {
+        alert("title is not found ....!");
+        return;
+    }
+    const tableBody = document.getElementById("expensesTableBody");
+    tableBody.innerHTML = "";
+    renderOneElement(element,tableBody);
+    
+}
+
 
 function showSpinner() {
     document.getElementById("spinner").classList.remove("d-none");

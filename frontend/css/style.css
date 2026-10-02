@@ -1,2 +1,9 @@
 /* Your custom styles go here.
    Use Bootstrap classes first, and write your own CSS only when you need to. */
+
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
