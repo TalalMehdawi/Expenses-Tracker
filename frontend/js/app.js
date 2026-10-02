@@ -243,7 +243,7 @@ async function search ()
 {
     let expenseData = await getExpenses();
     const searchValue=document.getElementById("searchInput").value;
-    let element = expenseData.find(e=>e.title===searchValue);
+    let element = expenseData.filter(e=>e.title===searchValue);
     if(!element)
     {
         alert("title is not found ....!");
@@ -251,6 +251,7 @@ async function search ()
     }
     const tableBody = document.getElementById("expensesTableBody");
     tableBody.innerHTML = "";
+    element.forEach(e=>renderOneElement(e,tableBody));
     renderOneElement(element,tableBody);
     
 }
