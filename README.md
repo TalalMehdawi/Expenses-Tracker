@@ -29,7 +29,11 @@ Prerequisites: Node.js, PostgreSQL, and VS Code (with the **Live Server** extens
    npm install express cors pg dotenv
    ```
 5. Make sure `package.json` contains `"type": "module"` (the project uses ES modules).
-6. Start the server:
+6. run this command to enter the backend folder
+   ``` bash
+   cd ./backend
+   ```
+8. Start the server:
    ```bash
    node server.js
    ```
